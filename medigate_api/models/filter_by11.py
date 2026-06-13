@@ -17,33 +17,35 @@ from inspect import getfullargspec
 import json
 import pprint
 import re  # noqa: F401
-
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, ValidationError, field_validator
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
-from medigate_api.models.compound_query_filter import CompoundQueryFilter
 from medigate_api.models.simple_query_filter import SimpleQueryFilter
-from typing import Union, Any, List, TYPE_CHECKING
-from pydantic import StrictStr, Field
+from medigate_api.models.validating_compound_query_filter_vulnerabilities import ValidatingCompoundQueryFilterVulnerabilities
+from typing import Union, Any, List, Set, TYPE_CHECKING, Optional, Dict
+from typing_extensions import Literal, Self
+from pydantic import Field
 
-FILTERBY11_ANY_OF_SCHEMAS = ["CompoundQueryFilter", "SimpleQueryFilter"]
+FILTERBY11_ANY_OF_SCHEMAS = ["SimpleQueryFilter", "ValidatingCompoundQueryFilterVulnerabilities"]
 
 class FilterBy11(BaseModel):
     """
-    Filters which vulnerabilities are matched. Can be a simple filter on a single field, or a combination of several filters for more complex logic.
+    Filters which vulnerabilities are matched. Only supports filtering by `id` / `name` fields.
     """
 
     # data type: SimpleQueryFilter
     anyof_schema_1_validator: Optional[SimpleQueryFilter] = None
-    # data type: CompoundQueryFilter
-    anyof_schema_2_validator: Optional[CompoundQueryFilter] = None
+    # data type: ValidatingCompoundQueryFilterVulnerabilities
+    anyof_schema_2_validator: Optional[ValidatingCompoundQueryFilterVulnerabilities] = None
     if TYPE_CHECKING:
-        actual_instance: Union[CompoundQueryFilter, SimpleQueryFilter]
+        actual_instance: Optional[Union[SimpleQueryFilter, ValidatingCompoundQueryFilterVulnerabilities]] = None
     else:
-        actual_instance: Any
-    any_of_schemas: List[str] = Field(FILTERBY11_ANY_OF_SCHEMAS, const=True)
+        actual_instance: Any = None
+    any_of_schemas: Set[str] = { "SimpleQueryFilter", "ValidatingCompoundQueryFilterVulnerabilities" }
 
-    class Config:
-        validate_assignment = True
+    model_config = {
+        "validate_assignment": True,
+        "protected_namespaces": (),
+    }
 
     def __init__(self, *args, **kwargs) -> None:
         if args:
@@ -55,9 +57,9 @@ class FilterBy11(BaseModel):
         else:
             super().__init__(**kwargs)
 
-    @validator('actual_instance')
+    @field_validator('actual_instance')
     def actual_instance_must_validate_anyof(cls, v):
-        instance = FilterBy11.construct()
+        instance = FilterBy11.model_construct()
         error_messages = []
         # validate data type: SimpleQueryFilter
         if not isinstance(v, SimpleQueryFilter):
@@ -65,26 +67,26 @@ class FilterBy11(BaseModel):
         else:
             return v
 
-        # validate data type: CompoundQueryFilter
-        if not isinstance(v, CompoundQueryFilter):
-            error_messages.append(f"Error! Input type `{type(v)}` is not `CompoundQueryFilter`")
+        # validate data type: ValidatingCompoundQueryFilterVulnerabilities
+        if not isinstance(v, ValidatingCompoundQueryFilterVulnerabilities):
+            error_messages.append(f"Error! Input type `{type(v)}` is not `ValidatingCompoundQueryFilterVulnerabilities`")
         else:
             return v
 
         if error_messages:
             # no match
-            raise ValueError("No match found when setting the actual_instance in FilterBy11 with anyOf schemas: CompoundQueryFilter, SimpleQueryFilter. Details: " + ", ".join(error_messages))
+            raise ValueError("No match found when setting the actual_instance in FilterBy11 with anyOf schemas: SimpleQueryFilter, ValidatingCompoundQueryFilterVulnerabilities. Details: " + ", ".join(error_messages))
         else:
             return v
 
     @classmethod
-    def from_dict(cls, obj: dict) -> FilterBy11:
+    def from_dict(cls, obj: Dict[str, Any]) -> Self:
         return cls.from_json(json.dumps(obj))
 
     @classmethod
-    def from_json(cls, json_str: str) -> FilterBy11:
+    def from_json(cls, json_str: str) -> Self:
         """Returns the object represented by the json string"""
-        instance = FilterBy11.construct()
+        instance = cls.model_construct()
         error_messages = []
         # anyof_schema_1_validator: Optional[SimpleQueryFilter] = None
         try:
@@ -92,16 +94,16 @@ class FilterBy11(BaseModel):
             return instance
         except (ValidationError, ValueError) as e:
              error_messages.append(str(e))
-        # anyof_schema_2_validator: Optional[CompoundQueryFilter] = None
+        # anyof_schema_2_validator: Optional[ValidatingCompoundQueryFilterVulnerabilities] = None
         try:
-            instance.actual_instance = CompoundQueryFilter.from_json(json_str)
+            instance.actual_instance = ValidatingCompoundQueryFilterVulnerabilities.from_json(json_str)
             return instance
         except (ValidationError, ValueError) as e:
              error_messages.append(str(e))
 
         if error_messages:
             # no match
-            raise ValueError("No match found when deserializing the JSON string into FilterBy11 with anyOf schemas: CompoundQueryFilter, SimpleQueryFilter. Details: " + ", ".join(error_messages))
+            raise ValueError("No match found when deserializing the JSON string into FilterBy11 with anyOf schemas: SimpleQueryFilter, ValidatingCompoundQueryFilterVulnerabilities. Details: " + ", ".join(error_messages))
         else:
             return instance
 
@@ -110,25 +112,23 @@ class FilterBy11(BaseModel):
         if self.actual_instance is None:
             return "null"
 
-        to_json = getattr(self.actual_instance, "to_json", None)
-        if callable(to_json):
+        if hasattr(self.actual_instance, "to_json") and callable(self.actual_instance.to_json):
             return self.actual_instance.to_json()
         else:
             return json.dumps(self.actual_instance)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Optional[Union[Dict[str, Any], SimpleQueryFilter, ValidatingCompoundQueryFilterVulnerabilities]]:
         """Returns the dict representation of the actual instance"""
         if self.actual_instance is None:
-            return "null"
+            return None
 
-        to_json = getattr(self.actual_instance, "to_json", None)
-        if callable(to_json):
+        if hasattr(self.actual_instance, "to_dict") and callable(self.actual_instance.to_dict):
             return self.actual_instance.to_dict()
         else:
-            return json.dumps(self.actual_instance)
+            return self.actual_instance
 
     def to_str(self) -> str:
         """Returns the string representation of the actual instance"""
-        return pprint.pformat(self.dict())
+        return pprint.pformat(self.model_dump())
 
 

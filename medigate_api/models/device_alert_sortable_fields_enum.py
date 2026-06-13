@@ -12,13 +12,10 @@
 """  # noqa: E501
 
 
+from __future__ import annotations
 import json
-import pprint
-import re  # noqa: F401
-from aenum import Enum, no_arg
-
-
-
+from enum import Enum
+from typing_extensions import Self
 
 
 class DeviceAlertSortableFieldsEnum(str, Enum):
@@ -67,8 +64,8 @@ class DeviceAlertSortableFieldsEnum(str, Enum):
     DEVICE_ALERT_UPDATED_TIME = 'device_alert_updated_time'
 
     @classmethod
-    def from_json(cls, json_str: str) -> DeviceAlertSortableFieldsEnum:
+    def from_json(cls, json_str: str) -> Self:
         """Create an instance of DeviceAlertSortableFieldsEnum from a JSON string"""
-        return DeviceAlertSortableFieldsEnum(json.loads(json_str))
+        return cls(json.loads(json_str))
 
 

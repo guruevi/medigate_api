@@ -2,9 +2,10 @@
 
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**field** | [**PublicOtActivityEventsSortableFieldsEnum**](PublicOtActivityEventsSortableFieldsEnum.md) | Name of field to sort by | 
+**var_field** | [**PublicOtActivityEventsSortableFieldsEnum**](PublicOtActivityEventsSortableFieldsEnum.md) | Name of field to sort by | 
 **order** | [**SortOrder**](SortOrder.md) | Direction of sort | 
 
 ## Example
@@ -17,12 +18,12 @@ json = "{}"
 # create an instance of ValidatingSortClausepublicOtActivityEvents from a JSON string
 validating_sort_clausepublic_ot_activity_events_instance = ValidatingSortClausepublicOtActivityEvents.from_json(json)
 # print the JSON string representation of the object
-print ValidatingSortClausepublicOtActivityEvents.to_json()
+print(ValidatingSortClausepublicOtActivityEvents.to_json())
 
 # convert the object into a dict
 validating_sort_clausepublic_ot_activity_events_dict = validating_sort_clausepublic_ot_activity_events_instance.to_dict()
 # create an instance of ValidatingSortClausepublicOtActivityEvents from a dict
-validating_sort_clausepublic_ot_activity_events_form_dict = validating_sort_clausepublic_ot_activity_events.from_dict(validating_sort_clausepublic_ot_activity_events_dict)
+validating_sort_clausepublic_ot_activity_events_from_dict = ValidatingSortClausepublicOtActivityEvents.from_dict(validating_sort_clausepublic_ot_activity_events_dict)
 ```
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -2,6 +2,7 @@
 
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **filter_by** | [**FilterBy1**](FilterBy1.md) |  | [optional] 
@@ -21,12 +22,12 @@ json = "{}"
 # create an instance of GetAlertedDevicesParameters from a JSON string
 get_alerted_devices_parameters_instance = GetAlertedDevicesParameters.from_json(json)
 # print the JSON string representation of the object
-print GetAlertedDevicesParameters.to_json()
+print(GetAlertedDevicesParameters.to_json())
 
 # convert the object into a dict
 get_alerted_devices_parameters_dict = get_alerted_devices_parameters_instance.to_dict()
 # create an instance of GetAlertedDevicesParameters from a dict
-get_alerted_devices_parameters_form_dict = get_alerted_devices_parameters.from_dict(get_alerted_devices_parameters_dict)
+get_alerted_devices_parameters_from_dict = GetAlertedDevicesParameters.from_dict(get_alerted_devices_parameters_dict)
 ```
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -17,74 +17,92 @@ import pprint
 import re  # noqa: F401
 import json
 
-
-from typing import List, Optional
-from pydantic import BaseModel, Field, StrictBool, StrictInt, conint, conlist
-from medigate_api.models.filter_by9 import FilterBy9
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt
+from typing import Any, ClassVar, Dict, List, Optional
+from typing_extensions import Annotated
+from medigate_api.models.filter_by8 import FilterBy8
 from medigate_api.models.validating_sort_clause_vulnerability import ValidatingSortClauseVulnerability
 from medigate_api.models.vulnerability_fields_enum import VulnerabilityFieldsEnum
+from typing import Optional, Set
+from typing_extensions import Self
+from pydantic_core import to_jsonable_python
 
 class GetVulnerabilitiesParameters(BaseModel):
     """
     GetVulnerabilitiesParameters
-    """
-    filter_by: Optional[FilterBy9] = None
-    fields: conlist(VulnerabilityFieldsEnum, min_items=1) = Field(..., description="Specify which fields to return for each item. See the endpoint description for details of supported fields.")
-    sort_by: Optional[conlist(ValidatingSortClauseVulnerability, min_items=1)] = Field(None, description="Specifies how the returned data should be sorted. If more than one sort clause is passed, additional clauses will be used to sort data that is equal in all previous clauses.")
-    offset: Optional[StrictInt] = Field(0, description="An offset in the data. This can be used to fetch all data in a paginated manner, by e.g requesting (offset=0, limit=100) followed by (offset=100, limit=100), (offset=200, limit=100), etc.")
-    limit: Optional[conint(strict=True, le=5000, ge=0)] = Field(100, description="Maximum amount of items to fetch")
+    """ # noqa: E501
+    filter_by: Optional[FilterBy8] = None
+    fields: Annotated[List[VulnerabilityFieldsEnum], Field(min_length=1)] = Field(description="Specify which fields to return for each item. See the endpoint description for details of supported fields.")
+    sort_by: Optional[Annotated[List[ValidatingSortClauseVulnerability], Field(min_length=1)]] = Field(default=None, description="Specifies how the returned data should be sorted. If more than one sort clause is passed, additional clauses will be used to sort data that is equal in all previous clauses.")
+    offset: Optional[StrictInt] = Field(default=0, description="An offset in the data. This can be used to fetch all data in a paginated manner, by e.g requesting (offset=0, limit=100) followed by (offset=100, limit=100), (offset=200, limit=100), etc.")
+    limit: Optional[Annotated[int, Field(le=5000, strict=True, ge=0)]] = Field(default=100, description="Maximum amount of items to fetch")
     include_count: Optional[StrictBool] = False
-    __properties = ["filter_by", "fields", "sort_by", "offset", "limit", "include_count"]
+    __properties: ClassVar[List[str]] = ["filter_by", "fields", "sort_by", "offset", "limit", "include_count"]
 
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(
+        validate_by_name=True,
+        validate_by_alias=True,
+        validate_assignment=True,
+        protected_namespaces=(),
+    )
+
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.dict(by_alias=True))
+        return pprint.pformat(self.model_dump(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        return json.dumps(self.to_dict())
+        return json.dumps(to_jsonable_python(self.to_dict()))
 
     @classmethod
-    def from_json(cls, json_str: str) -> GetVulnerabilitiesParameters:
+    def from_json(cls, json_str: str) -> Optional[Self]:
         """Create an instance of GetVulnerabilitiesParameters from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self):
-        """Returns the dictionary representation of the model using alias"""
-        _dict = self.dict(by_alias=True,
-                          exclude={
-                          },
-                          exclude_none=True)
+    def to_dict(self) -> Dict[str, Any]:
+        """Return the dictionary representation of the model using alias.
+
+        This has the following differences from calling pydantic's
+        `self.model_dump(by_alias=True)`:
+
+        * `None` is only added to the output dict for nullable fields that
+          were set at model initialization. Other fields with value `None`
+          are ignored.
+        """
+        excluded_fields: Set[str] = set([
+        ])
+
+        _dict = self.model_dump(
+            by_alias=True,
+            exclude=excluded_fields,
+            exclude_none=True,
+        )
         # override the default output from pydantic by calling `to_dict()` of filter_by
         if self.filter_by:
             _dict['filter_by'] = self.filter_by.to_dict()
         # override the default output from pydantic by calling `to_dict()` of each item in sort_by (list)
         _items = []
         if self.sort_by:
-            for _item in self.sort_by:
-                if _item:
-                    _items.append(_item.to_dict())
+            for _item_sort_by in self.sort_by:
+                if _item_sort_by:
+                    _items.append(_item_sort_by.to_dict())
             _dict['sort_by'] = _items
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> GetVulnerabilitiesParameters:
+    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
         """Create an instance of GetVulnerabilitiesParameters from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return GetVulnerabilitiesParameters.parse_obj(obj)
+            return cls.model_validate(obj)
 
-        _obj = GetVulnerabilitiesParameters.parse_obj({
-            "filter_by": FilterBy9.from_dict(obj.get("filter_by")) if obj.get("filter_by") is not None else None,
+        _obj = cls.model_validate({
+            "filter_by": FilterBy8.from_dict(obj["filter_by"]) if obj.get("filter_by") is not None else None,
             "fields": obj.get("fields"),
-            "sort_by": [ValidatingSortClauseVulnerability.from_dict(_item) for _item in obj.get("sort_by")] if obj.get("sort_by") is not None else None,
+            "sort_by": [ValidatingSortClauseVulnerability.from_dict(_item) for _item in obj["sort_by"]] if obj.get("sort_by") is not None else None,
             "offset": obj.get("offset") if obj.get("offset") is not None else 0,
             "limit": obj.get("limit") if obj.get("limit") is not None else 100,
             "include_count": obj.get("include_count") if obj.get("include_count") is not None else False

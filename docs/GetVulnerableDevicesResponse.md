@@ -2,6 +2,7 @@
 
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **devices** | **List[object]** |  | 
@@ -17,12 +18,12 @@ json = "{}"
 # create an instance of GetVulnerableDevicesResponse from a JSON string
 get_vulnerable_devices_response_instance = GetVulnerableDevicesResponse.from_json(json)
 # print the JSON string representation of the object
-print GetVulnerableDevicesResponse.to_json()
+print(GetVulnerableDevicesResponse.to_json())
 
 # convert the object into a dict
 get_vulnerable_devices_response_dict = get_vulnerable_devices_response_instance.to_dict()
 # create an instance of GetVulnerableDevicesResponse from a dict
-get_vulnerable_devices_response_form_dict = get_vulnerable_devices_response.from_dict(get_vulnerable_devices_response_dict)
+get_vulnerable_devices_response_from_dict = GetVulnerableDevicesResponse.from_dict(get_vulnerable_devices_response_dict)
 ```
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
