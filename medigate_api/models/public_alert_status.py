@@ -12,13 +12,10 @@
 """  # noqa: E501
 
 
+from __future__ import annotations
 import json
-import pprint
-import re  # noqa: F401
-from aenum import Enum, no_arg
-
-
-
+from enum import Enum
+from typing_extensions import Self
 
 
 class PublicAlertStatus(str, Enum):
@@ -33,8 +30,8 @@ class PublicAlertStatus(str, Enum):
     UNRESOLVED = 'unresolved'
 
     @classmethod
-    def from_json(cls, json_str: str) -> PublicAlertStatus:
+    def from_json(cls, json_str: str) -> Self:
         """Create an instance of PublicAlertStatus from a JSON string"""
-        return PublicAlertStatus(json.loads(json_str))
+        return cls(json.loads(json_str))
 
 

@@ -12,13 +12,10 @@
 """  # noqa: E501
 
 
+from __future__ import annotations
 import json
-import pprint
-import re  # noqa: F401
-from aenum import Enum, no_arg
-
-
-
+from enum import Enum
+from typing_extensions import Self
 
 
 class AlertedDeviceSortableFieldsEnum(str, Enum):
@@ -183,8 +180,8 @@ class AlertedDeviceSortableFieldsEnum(str, Enum):
     LESS_THAN_THE_CUSTOM_ATTRIBUTE_API_NAME_DEFINED_IN_THE_DASHBOARD_COMMA__INCLUDING_THE_PREFIX_BACK_SLASH_DOUBLE_QUOTE_CUSTOM_ATTRIBUTE_BACK_SLASH_DOUBLE_QUOTE_GREATER_THAN = '<the custom attribute api name defined in the dashboard, including the prefix \"custom_attribute_\">'
 
     @classmethod
-    def from_json(cls, json_str: str) -> AlertedDeviceSortableFieldsEnum:
+    def from_json(cls, json_str: str) -> Self:
         """Create an instance of AlertedDeviceSortableFieldsEnum from a JSON string"""
-        return AlertedDeviceSortableFieldsEnum(json.loads(json_str))
+        return cls(json.loads(json_str))
 
 

@@ -1,5 +1,3 @@
-# coding: utf-8
-
 """
     Medigate API
 
@@ -12,29 +10,23 @@
 """  # noqa: E501
 
 
-import re  # noqa: F401
-import io
 import warnings
-
-from pydantic import validate_arguments, ValidationError
-
+from pydantic import validate_call, Field, StrictFloat, StrictStr, StrictInt
+from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
-from pydantic import Field, StrictInt
 
+from pydantic import Field
 from typing import Any
-
+from typing_extensions import Annotated
 from medigate_api.models.get_alerted_devices_parameters import GetAlertedDevicesParameters
 from medigate_api.models.get_alerted_devices_response import GetAlertedDevicesResponse
 from medigate_api.models.get_alerts_parameters import GetAlertsParameters
 from medigate_api.models.get_alerts_response import GetAlertsResponse
 from medigate_api.models.public_set_alert_resolution_params import PublicSetAlertResolutionParams
 
-from medigate_api.api_client import ApiClient
+from medigate_api.api_client import ApiClient, RequestSerialized
 from medigate_api.api_response import ApiResponse
-from medigate_api.exceptions import (  # noqa: F401
-    ApiTypeError,
-    ApiValueError
-)
+from medigate_api.rest import RESTResponseType
 
 
 class AlertsApi:
@@ -49,454 +41,848 @@ class AlertsApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def get_alert_devices_api_v1_alerts_alert_id_devices_post(self, alert_id : Annotated[StrictInt, Field(..., description="Alert ID, as indicated in the `id` field of an alert")], get_alerted_devices_parameters : GetAlertedDevicesParameters, **kwargs) -> GetAlertedDevicesResponse:  # noqa: E501
-        """Get devices affected by an alert  # noqa: E501
 
-        Get devices affected by an alert. This endpoint returns similar data to the [Get details of devices][1] endpoint, except that only affected devices are returned. There is also an additional device field indicating if the alert is resolved for the device.  ### Fields supported by this endpoint All fields supported by [Get details of devices][1] endpoint, and additionally:  | Field         | Description                                                                              | Supported Operations                                        | |---------------|------------------------------------------------------------------------------------------|-------------------------------------------------------------| | `is_resolved` | A boolean field indicating if the alert triggered for a device is resolved or unresolved | `is_null`,`not_equals`,`is_not_null`,`not_in`,`equals`,`in` |   [1]: #operation/get_devices  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
+    @validate_call
+    def get_alert_devices_api_v1_alerts_alert_id_devices_post(
+        self,
+        alert_id: Annotated[int, Field(strict=True, gt=0, description="Alert ID, as indicated in the `id` field of an alert")],
+        get_alerted_devices_parameters: GetAlertedDevicesParameters,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> GetAlertedDevicesResponse:
+        """Get devices affected by an alert
 
-        >>> thread = api.get_alert_devices_api_v1_alerts_alert_id_devices_post(alert_id, get_alerted_devices_parameters, async_req=True)
-        >>> result = thread.get()
-
-        :param alert_id: Alert ID, as indicated in the `id` field of an alert (required)
-        :type alert_id: int
-        :param get_alerted_devices_parameters: (required)
-        :type get_alerted_devices_parameters: GetAlertedDevicesParameters
-        :param async_req: Whether to execute the request asynchronously.
-        :type async_req: bool, optional
-        :param _request_timeout: timeout setting for this request.
-               If one number provided, it will be total request
-               timeout. It can also be a pair (tuple) of
-               (connection, read) timeouts.
-        :return: Returns the result object.
-                 If the method is called asynchronously,
-                 returns the request thread.
-        :rtype: GetAlertedDevicesResponse
-        """
-        kwargs['_return_http_data_only'] = True
-        if '_preload_content' in kwargs:
-            message = "Error! Please call the get_alert_devices_api_v1_alerts_alert_id_devices_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
-            raise ValueError(message)
-        return self.get_alert_devices_api_v1_alerts_alert_id_devices_post_with_http_info(alert_id, get_alerted_devices_parameters, **kwargs)  # noqa: E501
-
-    @validate_arguments
-    def get_alert_devices_api_v1_alerts_alert_id_devices_post_with_http_info(self, alert_id : Annotated[StrictInt, Field(..., description="Alert ID, as indicated in the `id` field of an alert")], get_alerted_devices_parameters : GetAlertedDevicesParameters, **kwargs) -> ApiResponse:  # noqa: E501
-        """Get devices affected by an alert  # noqa: E501
-
-        Get devices affected by an alert. This endpoint returns similar data to the [Get details of devices][1] endpoint, except that only affected devices are returned. There is also an additional device field indicating if the alert is resolved for the device.  ### Fields supported by this endpoint All fields supported by [Get details of devices][1] endpoint, and additionally:  | Field         | Description                                                                              | Supported Operations                                        | |---------------|------------------------------------------------------------------------------------------|-------------------------------------------------------------| | `is_resolved` | A boolean field indicating if the alert triggered for a device is resolved or unresolved | `is_null`,`not_equals`,`is_not_null`,`not_in`,`equals`,`in` |   [1]: #operation/get_devices  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
-
-        >>> thread = api.get_alert_devices_api_v1_alerts_alert_id_devices_post_with_http_info(alert_id, get_alerted_devices_parameters, async_req=True)
-        >>> result = thread.get()
+        Get devices affected by an alert. This endpoint returns similar data to the [Get details of devices][1] endpoint, except that only affected devices are returned. There is also an additional device field indicating if the alert is resolved for the device.  ### Fields supported by this endpoint All fields supported by [Get details of devices][1] endpoint, and additionally:  | Field         | Description                                                                              | Supported Operations                                        | |---------------|------------------------------------------------------------------------------------------|-------------------------------------------------------------| | `is_resolved` | A boolean field indicating if the alert triggered for a device is resolved or unresolved | `is_null`,`not_equals`,`is_not_null`,`not_in`,`equals`,`in` |   [1]: #operation/get_devices
 
         :param alert_id: Alert ID, as indicated in the `id` field of an alert (required)
         :type alert_id: int
         :param get_alerted_devices_parameters: (required)
         :type get_alerted_devices_parameters: GetAlertedDevicesParameters
-        :param async_req: Whether to execute the request asynchronously.
-        :type async_req: bool, optional
-        :param _preload_content: if False, the ApiResponse.data will
-                                 be set to none and raw_data will store the
-                                 HTTP response body without reading/decoding.
-                                 Default is True.
-        :type _preload_content: bool, optional
-        :param _return_http_data_only: response data instead of ApiResponse
-                                       object with status code, headers, etc
-        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the authentication
-                              in the spec for a single request.
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
         :type _request_auth: dict, optional
-        :type _content_type: string, optional: force content-type for the request
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
         :return: Returns the result object.
-                 If the method is called asynchronously,
-                 returns the request thread.
-        :rtype: tuple(GetAlertedDevicesResponse, status_code(int), headers(HTTPHeaderDict))
-        """
+        """ # noqa: E501
 
-        _params = locals()
-
-        _all_params = [
-            'alert_id',
-            'get_alerted_devices_parameters'
-        ]
-        _all_params.extend(
-            [
-                'async_req',
-                '_return_http_data_only',
-                '_preload_content',
-                '_request_timeout',
-                '_request_auth',
-                '_content_type',
-                '_headers'
-            ]
+        _param = self._get_alert_devices_api_v1_alerts_alert_id_devices_post_serialize(
+            alert_id=alert_id,
+            get_alerted_devices_parameters=get_alerted_devices_parameters,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
         )
 
-        # validate the arguments
-        for _key, _val in _params['kwargs'].items():
-            if _key not in _all_params:
-                raise ApiTypeError(
-                    "Got an unexpected keyword argument '%s'"
-                    " to method get_alert_devices_api_v1_alerts_alert_id_devices_post" % _key
-                )
-            _params[_key] = _val
-        del _params['kwargs']
-
-        _collection_formats = {}
-
-        # process the path parameters
-        _path_params = {}
-        if _params['alert_id'] is not None:
-            _path_params['alert_id'] = _params['alert_id']
-
-
-        # process the query parameters
-        _query_params = []
-        # process the header parameters
-        _header_params = dict(_params.get('_headers', {}))
-        # process the form parameters
-        _form_params = []
-        _files = {}
-        # process the body parameter
-        _body_params = None
-        if _params['get_alerted_devices_parameters'] is not None:
-            _body_params = _params['get_alerted_devices_parameters']
-
-        # set the HTTP header `Accept`
-        _header_params['Accept'] = self.api_client.select_header_accept(
-            ['application/json'])  # noqa: E501
-
-        # set the HTTP header `Content-Type`
-        _content_types_list = _params.get('_content_type',
-            self.api_client.select_header_content_type(
-                ['application/json']))
-        if _content_types_list:
-                _header_params['Content-Type'] = _content_types_list
-
-        # authentication setting
-        _auth_settings = ['CustomHTTPBearer']  # noqa: E501
-
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetAlertedDevicesResponse",
             '422': "HTTPValidationError",
         }
-
-        return self.api_client.call_api(
-            '/api/v1/alerts/{alert_id}/devices', 'POST',
-            _path_params,
-            _query_params,
-            _header_params,
-            body=_body_params,
-            post_params=_form_params,
-            files=_files,
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
             response_types_map=_response_types_map,
-            auth_settings=_auth_settings,
-            async_req=_params.get('async_req'),
-            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
-            _preload_content=_params.get('_preload_content', True),
-            _request_timeout=_params.get('_request_timeout'),
-            collection_formats=_collection_formats,
-            _request_auth=_params.get('_request_auth'))
+        ).data
 
-    @validate_arguments
-    def get_alerts_api_v1_alerts_post(self, get_alerts_parameters : GetAlertsParameters, **kwargs) -> GetAlertsResponse:  # noqa: E501
-        """Get details of alerts  # noqa: E501
 
-        The data returned by this endpoint corresponds to the Alerts table in the dashboard.  Alerts are returned in ascending Alert ID order.  ### Fields supported by this endpoint  <details><summary>Click to expand</summary>  | Field                      | Description                                                                                                                                           | Supported Operations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| | `id`                       | Platform unique Alert ID                                                                                                                              | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `alert_name`               | The alert name, such as “Malicious Internet Communication: 62.172.138.35”                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_type_name`          | An alert type such as \"Outdated Firmware\"                                                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_class`              | The alert class, such as “Pre-Defined Alerts” and “Custom Alerts”                                                                                     | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `category`                 | Alert category such as \"Risk\" or \"Segmentation\"                                                                                                       | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `detected_time`            | Date and time when the Alert was first detected                                                                                                       | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `updated_time`             | Date and time of last Alert update                                                                                                                    | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `devices_count`            | Number of total affected devices                                                                                                                      | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `unresolved_devices_count` | Number of unresolved devices                                                                                                                          | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `medical_devices_count`    | Number of affected Medical devices                                                                                                                    | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `iot_devices_count`        | Number of affected IoT devices                                                                                                                        | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `it_devices_count`         | Number of affected IT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `ot_devices_count`         | Number of affected OT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `status`                   | Alert status such as \"Resolved\" or \"Acknowledged\"                                                                                                     | _Not filterable_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | | `malicious_ip_tags_list`   | The Malicious IP Tags, powered by Anomali, associated with the Attempted Malicious Internet Communication and Malicious Internet Communication alerts | `has_any_not_ends_with`,`has_only_ends_with`,`has_only_equals`,`has_none_contains`,`equals`,`has_only_starts_with`,`contains`,`has_only_contains`,`has_none_ends_with`,`has_all_equals`,`not_contains`,`superset_of`,`none_equal`,`in`,`has_none_equals`,`starts_with`,`not_equals`,`has_none_starts_with`,`has_any_not_contains`,`is_null`,`has_any_contains`,`has_any_ends_with`,`is_not_null`,`all_equal`,`has_any_equals`,`ends_with`,`not_in`,`has_any_not_equals`,`not_ends_with`,`has_any_starts_with`,`has_any_not_starts_with`,`not_starts_with` |  </details>  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
+    @validate_call
+    def get_alert_devices_api_v1_alerts_alert_id_devices_post_with_http_info(
+        self,
+        alert_id: Annotated[int, Field(strict=True, gt=0, description="Alert ID, as indicated in the `id` field of an alert")],
+        get_alerted_devices_parameters: GetAlertedDevicesParameters,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[GetAlertedDevicesResponse]:
+        """Get devices affected by an alert
 
-        >>> thread = api.get_alerts_api_v1_alerts_post(get_alerts_parameters, async_req=True)
-        >>> result = thread.get()
+        Get devices affected by an alert. This endpoint returns similar data to the [Get details of devices][1] endpoint, except that only affected devices are returned. There is also an additional device field indicating if the alert is resolved for the device.  ### Fields supported by this endpoint All fields supported by [Get details of devices][1] endpoint, and additionally:  | Field         | Description                                                                              | Supported Operations                                        | |---------------|------------------------------------------------------------------------------------------|-------------------------------------------------------------| | `is_resolved` | A boolean field indicating if the alert triggered for a device is resolved or unresolved | `is_null`,`not_equals`,`is_not_null`,`not_in`,`equals`,`in` |   [1]: #operation/get_devices
 
-        :param get_alerts_parameters: (required)
-        :type get_alerts_parameters: GetAlertsParameters
-        :param async_req: Whether to execute the request asynchronously.
-        :type async_req: bool, optional
-        :param _request_timeout: timeout setting for this request.
-               If one number provided, it will be total request
-               timeout. It can also be a pair (tuple) of
-               (connection, read) timeouts.
-        :return: Returns the result object.
-                 If the method is called asynchronously,
-                 returns the request thread.
-        :rtype: GetAlertsResponse
-        """
-        kwargs['_return_http_data_only'] = True
-        if '_preload_content' in kwargs:
-            message = "Error! Please call the get_alerts_api_v1_alerts_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
-            raise ValueError(message)
-        return self.get_alerts_api_v1_alerts_post_with_http_info(get_alerts_parameters, **kwargs)  # noqa: E501
-
-    @validate_arguments
-    def get_alerts_api_v1_alerts_post_with_http_info(self, get_alerts_parameters : GetAlertsParameters, **kwargs) -> ApiResponse:  # noqa: E501
-        """Get details of alerts  # noqa: E501
-
-        The data returned by this endpoint corresponds to the Alerts table in the dashboard.  Alerts are returned in ascending Alert ID order.  ### Fields supported by this endpoint  <details><summary>Click to expand</summary>  | Field                      | Description                                                                                                                                           | Supported Operations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| | `id`                       | Platform unique Alert ID                                                                                                                              | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `alert_name`               | The alert name, such as “Malicious Internet Communication: 62.172.138.35”                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_type_name`          | An alert type such as \"Outdated Firmware\"                                                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_class`              | The alert class, such as “Pre-Defined Alerts” and “Custom Alerts”                                                                                     | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `category`                 | Alert category such as \"Risk\" or \"Segmentation\"                                                                                                       | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `detected_time`            | Date and time when the Alert was first detected                                                                                                       | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `updated_time`             | Date and time of last Alert update                                                                                                                    | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `devices_count`            | Number of total affected devices                                                                                                                      | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `unresolved_devices_count` | Number of unresolved devices                                                                                                                          | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `medical_devices_count`    | Number of affected Medical devices                                                                                                                    | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `iot_devices_count`        | Number of affected IoT devices                                                                                                                        | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `it_devices_count`         | Number of affected IT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `ot_devices_count`         | Number of affected OT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `status`                   | Alert status such as \"Resolved\" or \"Acknowledged\"                                                                                                     | _Not filterable_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | | `malicious_ip_tags_list`   | The Malicious IP Tags, powered by Anomali, associated with the Attempted Malicious Internet Communication and Malicious Internet Communication alerts | `has_any_not_ends_with`,`has_only_ends_with`,`has_only_equals`,`has_none_contains`,`equals`,`has_only_starts_with`,`contains`,`has_only_contains`,`has_none_ends_with`,`has_all_equals`,`not_contains`,`superset_of`,`none_equal`,`in`,`has_none_equals`,`starts_with`,`not_equals`,`has_none_starts_with`,`has_any_not_contains`,`is_null`,`has_any_contains`,`has_any_ends_with`,`is_not_null`,`all_equal`,`has_any_equals`,`ends_with`,`not_in`,`has_any_not_equals`,`not_ends_with`,`has_any_starts_with`,`has_any_not_starts_with`,`not_starts_with` |  </details>  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
-
-        >>> thread = api.get_alerts_api_v1_alerts_post_with_http_info(get_alerts_parameters, async_req=True)
-        >>> result = thread.get()
-
-        :param get_alerts_parameters: (required)
-        :type get_alerts_parameters: GetAlertsParameters
-        :param async_req: Whether to execute the request asynchronously.
-        :type async_req: bool, optional
-        :param _preload_content: if False, the ApiResponse.data will
-                                 be set to none and raw_data will store the
-                                 HTTP response body without reading/decoding.
-                                 Default is True.
-        :type _preload_content: bool, optional
-        :param _return_http_data_only: response data instead of ApiResponse
-                                       object with status code, headers, etc
-        :type _return_http_data_only: bool, optional
+        :param alert_id: Alert ID, as indicated in the `id` field of an alert (required)
+        :type alert_id: int
+        :param get_alerted_devices_parameters: (required)
+        :type get_alerted_devices_parameters: GetAlertedDevicesParameters
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the authentication
-                              in the spec for a single request.
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
         :type _request_auth: dict, optional
-        :type _content_type: string, optional: force content-type for the request
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
         :return: Returns the result object.
-                 If the method is called asynchronously,
-                 returns the request thread.
-        :rtype: tuple(GetAlertsResponse, status_code(int), headers(HTTPHeaderDict))
-        """
+        """ # noqa: E501
 
-        _params = locals()
-
-        _all_params = [
-            'get_alerts_parameters'
-        ]
-        _all_params.extend(
-            [
-                'async_req',
-                '_return_http_data_only',
-                '_preload_content',
-                '_request_timeout',
-                '_request_auth',
-                '_content_type',
-                '_headers'
-            ]
+        _param = self._get_alert_devices_api_v1_alerts_alert_id_devices_post_serialize(
+            alert_id=alert_id,
+            get_alerted_devices_parameters=get_alerted_devices_parameters,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
         )
 
-        # validate the arguments
-        for _key, _val in _params['kwargs'].items():
-            if _key not in _all_params:
-                raise ApiTypeError(
-                    "Got an unexpected keyword argument '%s'"
-                    " to method get_alerts_api_v1_alerts_post" % _key
-                )
-            _params[_key] = _val
-        del _params['kwargs']
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "GetAlertedDevicesResponse",
+            '422': "HTTPValidationError",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
 
-        _collection_formats = {}
+
+    @validate_call
+    def get_alert_devices_api_v1_alerts_alert_id_devices_post_without_preload_content(
+        self,
+        alert_id: Annotated[int, Field(strict=True, gt=0, description="Alert ID, as indicated in the `id` field of an alert")],
+        get_alerted_devices_parameters: GetAlertedDevicesParameters,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Get devices affected by an alert
+
+        Get devices affected by an alert. This endpoint returns similar data to the [Get details of devices][1] endpoint, except that only affected devices are returned. There is also an additional device field indicating if the alert is resolved for the device.  ### Fields supported by this endpoint All fields supported by [Get details of devices][1] endpoint, and additionally:  | Field         | Description                                                                              | Supported Operations                                        | |---------------|------------------------------------------------------------------------------------------|-------------------------------------------------------------| | `is_resolved` | A boolean field indicating if the alert triggered for a device is resolved or unresolved | `is_null`,`not_equals`,`is_not_null`,`not_in`,`equals`,`in` |   [1]: #operation/get_devices
+
+        :param alert_id: Alert ID, as indicated in the `id` field of an alert (required)
+        :type alert_id: int
+        :param get_alerted_devices_parameters: (required)
+        :type get_alerted_devices_parameters: GetAlertedDevicesParameters
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._get_alert_devices_api_v1_alerts_alert_id_devices_post_serialize(
+            alert_id=alert_id,
+            get_alerted_devices_parameters=get_alerted_devices_parameters,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "GetAlertedDevicesResponse",
+            '422': "HTTPValidationError",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _get_alert_devices_api_v1_alerts_alert_id_devices_post_serialize(
+        self,
+        alert_id,
+        get_alerted_devices_parameters,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
 
         # process the path parameters
-        _path_params = {}
-
+        if alert_id is not None:
+            _path_params['alert_id'] = alert_id
         # process the query parameters
-        _query_params = []
         # process the header parameters
-        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
         # process the body parameter
-        _body_params = None
-        if _params['get_alerts_parameters'] is not None:
-            _body_params = _params['get_alerts_parameters']
+        if get_alerted_devices_parameters is not None:
+            _body_params = get_alerted_devices_parameters
+
 
         # set the HTTP header `Accept`
-        _header_params['Accept'] = self.api_client.select_header_accept(
-            ['application/json'])  # noqa: E501
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
 
         # set the HTTP header `Content-Type`
-        _content_types_list = _params.get('_content_type',
-            self.api_client.select_header_content_type(
-                ['application/json']))
-        if _content_types_list:
-                _header_params['Content-Type'] = _content_types_list
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
 
         # authentication setting
-        _auth_settings = ['CustomHTTPBearer']  # noqa: E501
+        _auth_settings: List[str] = [
+            'CustomHTTPBearer'
+        ]
 
-        _response_types_map = {
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/api/v1/alerts/{alert_id}/devices',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def get_alerts_api_v1_alerts_post(
+        self,
+        get_alerts_parameters: GetAlertsParameters,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> GetAlertsResponse:
+        """Get details of alerts
+
+        The data returned by this endpoint corresponds to the Alerts table in the dashboard.  Alerts are returned in ascending Alert ID order.  ### Fields supported by this endpoint  <details><summary>Click to expand</summary>  | Field                      | Description                                                                                                                                           | Supported Operations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| | `id`                       | Platform unique Alert ID                                                                                                                              | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `alert_name`               | The alert name, such as “Malicious Internet Communication: 62.172.138.35”                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_type_name`          | An alert type such as \"Outdated Firmware\"                                                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_class`              | The alert class, such as “Pre-Defined Alerts” and “Custom Alerts”                                                                                     | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `category`                 | Alert category such as \"Risk\" or \"Segmentation\"                                                                                                       | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `detected_time`            | Date and time when the Alert was first detected                                                                                                       | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `updated_time`             | Date and time of last Alert update                                                                                                                    | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `devices_count`            | Number of total affected devices                                                                                                                      | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `unresolved_devices_count` | Number of unresolved devices                                                                                                                          | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `medical_devices_count`    | Number of affected Medical devices                                                                                                                    | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `iot_devices_count`        | Number of affected IoT devices                                                                                                                        | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `it_devices_count`         | Number of affected IT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `ot_devices_count`         | Number of affected OT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `status`                   | Alert status such as \"Resolved\" or \"Acknowledged\"                                                                                                     | _Not filterable_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | | `malicious_ip_tags_list`   | The Malicious IP Tags, powered by Anomali, associated with the Attempted Malicious Internet Communication and Malicious Internet Communication alerts | `has_any_not_ends_with`,`has_only_ends_with`,`has_only_equals`,`has_none_contains`,`equals`,`has_only_starts_with`,`contains`,`has_only_contains`,`has_none_ends_with`,`has_all_equals`,`not_contains`,`superset_of`,`none_equal`,`in`,`has_none_equals`,`starts_with`,`not_equals`,`has_none_starts_with`,`has_any_not_contains`,`is_null`,`has_any_contains`,`has_any_ends_with`,`is_not_null`,`all_equal`,`has_any_equals`,`ends_with`,`not_in`,`has_any_not_equals`,`not_ends_with`,`has_any_starts_with`,`has_any_not_starts_with`,`not_starts_with` |  </details>
+
+        :param get_alerts_parameters: (required)
+        :type get_alerts_parameters: GetAlertsParameters
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._get_alerts_api_v1_alerts_post_serialize(
+            get_alerts_parameters=get_alerts_parameters,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetAlertsResponse",
             '422': "HTTPValidationError",
         }
-
-        return self.api_client.call_api(
-            '/api/v1/alerts/', 'POST',
-            _path_params,
-            _query_params,
-            _header_params,
-            body=_body_params,
-            post_params=_form_params,
-            files=_files,
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
             response_types_map=_response_types_map,
-            auth_settings=_auth_settings,
-            async_req=_params.get('async_req'),
-            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
-            _preload_content=_params.get('_preload_content', True),
-            _request_timeout=_params.get('_request_timeout'),
-            collection_formats=_collection_formats,
-            _request_auth=_params.get('_request_auth'))
+        ).data
 
-    @validate_arguments
-    def set_alert_resolution_api_v1_device_alert_status_set_post(self, public_set_alert_resolution_params : PublicSetAlertResolutionParams, **kwargs) -> object:  # noqa: E501
-        """Set status for device alert relations  # noqa: E501
 
-        Set device-alert status to resolved or unresolved. If no filter_by parameter is provided, this API call will resolve or unresolve all device-alert relations for the specified alert IDs. if a filter_by parameter is provided, the API call will exclusively resolve or unresolve device-alert relations that meet the specified filter criteria   ### Fields supported by this endpoint All fields supported by [Get details of devices][1].  [1]: #operation/get_devices  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
+    @validate_call
+    def get_alerts_api_v1_alerts_post_with_http_info(
+        self,
+        get_alerts_parameters: GetAlertsParameters,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[GetAlertsResponse]:
+        """Get details of alerts
 
-        >>> thread = api.set_alert_resolution_api_v1_device_alert_status_set_post(public_set_alert_resolution_params, async_req=True)
-        >>> result = thread.get()
+        The data returned by this endpoint corresponds to the Alerts table in the dashboard.  Alerts are returned in ascending Alert ID order.  ### Fields supported by this endpoint  <details><summary>Click to expand</summary>  | Field                      | Description                                                                                                                                           | Supported Operations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| | `id`                       | Platform unique Alert ID                                                                                                                              | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `alert_name`               | The alert name, such as “Malicious Internet Communication: 62.172.138.35”                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_type_name`          | An alert type such as \"Outdated Firmware\"                                                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_class`              | The alert class, such as “Pre-Defined Alerts” and “Custom Alerts”                                                                                     | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `category`                 | Alert category such as \"Risk\" or \"Segmentation\"                                                                                                       | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `detected_time`            | Date and time when the Alert was first detected                                                                                                       | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `updated_time`             | Date and time of last Alert update                                                                                                                    | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `devices_count`            | Number of total affected devices                                                                                                                      | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `unresolved_devices_count` | Number of unresolved devices                                                                                                                          | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `medical_devices_count`    | Number of affected Medical devices                                                                                                                    | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `iot_devices_count`        | Number of affected IoT devices                                                                                                                        | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `it_devices_count`         | Number of affected IT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `ot_devices_count`         | Number of affected OT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `status`                   | Alert status such as \"Resolved\" or \"Acknowledged\"                                                                                                     | _Not filterable_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | | `malicious_ip_tags_list`   | The Malicious IP Tags, powered by Anomali, associated with the Attempted Malicious Internet Communication and Malicious Internet Communication alerts | `has_any_not_ends_with`,`has_only_ends_with`,`has_only_equals`,`has_none_contains`,`equals`,`has_only_starts_with`,`contains`,`has_only_contains`,`has_none_ends_with`,`has_all_equals`,`not_contains`,`superset_of`,`none_equal`,`in`,`has_none_equals`,`starts_with`,`not_equals`,`has_none_starts_with`,`has_any_not_contains`,`is_null`,`has_any_contains`,`has_any_ends_with`,`is_not_null`,`all_equal`,`has_any_equals`,`ends_with`,`not_in`,`has_any_not_equals`,`not_ends_with`,`has_any_starts_with`,`has_any_not_starts_with`,`not_starts_with` |  </details>
 
-        :param public_set_alert_resolution_params: (required)
-        :type public_set_alert_resolution_params: PublicSetAlertResolutionParams
-        :param async_req: Whether to execute the request asynchronously.
-        :type async_req: bool, optional
-        :param _request_timeout: timeout setting for this request.
-               If one number provided, it will be total request
-               timeout. It can also be a pair (tuple) of
-               (connection, read) timeouts.
-        :return: Returns the result object.
-                 If the method is called asynchronously,
-                 returns the request thread.
-        :rtype: object
-        """
-        kwargs['_return_http_data_only'] = True
-        if '_preload_content' in kwargs:
-            message = "Error! Please call the set_alert_resolution_api_v1_device_alert_status_set_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
-            raise ValueError(message)
-        return self.set_alert_resolution_api_v1_device_alert_status_set_post_with_http_info(public_set_alert_resolution_params, **kwargs)  # noqa: E501
-
-    @validate_arguments
-    def set_alert_resolution_api_v1_device_alert_status_set_post_with_http_info(self, public_set_alert_resolution_params : PublicSetAlertResolutionParams, **kwargs) -> ApiResponse:  # noqa: E501
-        """Set status for device alert relations  # noqa: E501
-
-        Set device-alert status to resolved or unresolved. If no filter_by parameter is provided, this API call will resolve or unresolve all device-alert relations for the specified alert IDs. if a filter_by parameter is provided, the API call will exclusively resolve or unresolve device-alert relations that meet the specified filter criteria   ### Fields supported by this endpoint All fields supported by [Get details of devices][1].  [1]: #operation/get_devices  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
-
-        >>> thread = api.set_alert_resolution_api_v1_device_alert_status_set_post_with_http_info(public_set_alert_resolution_params, async_req=True)
-        >>> result = thread.get()
-
-        :param public_set_alert_resolution_params: (required)
-        :type public_set_alert_resolution_params: PublicSetAlertResolutionParams
-        :param async_req: Whether to execute the request asynchronously.
-        :type async_req: bool, optional
-        :param _preload_content: if False, the ApiResponse.data will
-                                 be set to none and raw_data will store the
-                                 HTTP response body without reading/decoding.
-                                 Default is True.
-        :type _preload_content: bool, optional
-        :param _return_http_data_only: response data instead of ApiResponse
-                                       object with status code, headers, etc
-        :type _return_http_data_only: bool, optional
+        :param get_alerts_parameters: (required)
+        :type get_alerts_parameters: GetAlertsParameters
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the authentication
-                              in the spec for a single request.
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
         :type _request_auth: dict, optional
-        :type _content_type: string, optional: force content-type for the request
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
         :return: Returns the result object.
-                 If the method is called asynchronously,
-                 returns the request thread.
-        :rtype: tuple(object, status_code(int), headers(HTTPHeaderDict))
-        """
+        """ # noqa: E501
 
-        _params = locals()
-
-        _all_params = [
-            'public_set_alert_resolution_params'
-        ]
-        _all_params.extend(
-            [
-                'async_req',
-                '_return_http_data_only',
-                '_preload_content',
-                '_request_timeout',
-                '_request_auth',
-                '_content_type',
-                '_headers'
-            ]
+        _param = self._get_alerts_api_v1_alerts_post_serialize(
+            get_alerts_parameters=get_alerts_parameters,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
         )
 
-        # validate the arguments
-        for _key, _val in _params['kwargs'].items():
-            if _key not in _all_params:
-                raise ApiTypeError(
-                    "Got an unexpected keyword argument '%s'"
-                    " to method set_alert_resolution_api_v1_device_alert_status_set_post" % _key
-                )
-            _params[_key] = _val
-        del _params['kwargs']
-
-        _collection_formats = {}
-
-        # process the path parameters
-        _path_params = {}
-
-        # process the query parameters
-        _query_params = []
-        # process the header parameters
-        _header_params = dict(_params.get('_headers', {}))
-        # process the form parameters
-        _form_params = []
-        _files = {}
-        # process the body parameter
-        _body_params = None
-        if _params['public_set_alert_resolution_params'] is not None:
-            _body_params = _params['public_set_alert_resolution_params']
-
-        # set the HTTP header `Accept`
-        _header_params['Accept'] = self.api_client.select_header_accept(
-            ['application/json'])  # noqa: E501
-
-        # set the HTTP header `Content-Type`
-        _content_types_list = _params.get('_content_type',
-            self.api_client.select_header_content_type(
-                ['application/json']))
-        if _content_types_list:
-                _header_params['Content-Type'] = _content_types_list
-
-        # authentication setting
-        _auth_settings = ['CustomHTTPBearer']  # noqa: E501
-
-        _response_types_map = {
-            '200': "object",
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "GetAlertsResponse",
             '422': "HTTPValidationError",
         }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
 
-        return self.api_client.call_api(
-            '/api/v1/device-alert-status/set', 'POST',
-            _path_params,
-            _query_params,
-            _header_params,
+
+    @validate_call
+    def get_alerts_api_v1_alerts_post_without_preload_content(
+        self,
+        get_alerts_parameters: GetAlertsParameters,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Get details of alerts
+
+        The data returned by this endpoint corresponds to the Alerts table in the dashboard.  Alerts are returned in ascending Alert ID order.  ### Fields supported by this endpoint  <details><summary>Click to expand</summary>  | Field                      | Description                                                                                                                                           | Supported Operations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| | `id`                       | Platform unique Alert ID                                                                                                                              | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `alert_name`               | The alert name, such as “Malicious Internet Communication: 62.172.138.35”                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_type_name`          | An alert type such as \"Outdated Firmware\"                                                                                                             | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `alert_class`              | The alert class, such as “Pre-Defined Alerts” and “Custom Alerts”                                                                                     | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `category`                 | Alert category such as \"Risk\" or \"Segmentation\"                                                                                                       | `starts_with`,`not_equals`,`ends_with`,`not_in`,`not_ends_with`,`not_contains`,`is_null`,`not_starts_with`,`is_not_null`,`equals`,`in`,`contains`                                                                                                                                                                                                                                                                                                                                                                                                         | | `detected_time`            | Date and time when the Alert was first detected                                                                                                       | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `updated_time`             | Date and time of last Alert update                                                                                                                    | `not_equals`,`after_seconds_from_now`,`less_or_equal`,`after_seconds_ago`,`greater_or_equal`,`not_between`,`is_null`,`before`,`after`,`is_not_null`,`equals`,`before_seconds_ago`,`not_in`,`between`,`less`,`greater`,`before_seconds_from_now`,`in`                                                                                                                                                                                                                                                                                                      | | `devices_count`            | Number of total affected devices                                                                                                                      | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `unresolved_devices_count` | Number of unresolved devices                                                                                                                          | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `medical_devices_count`    | Number of affected Medical devices                                                                                                                    | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `iot_devices_count`        | Number of affected IoT devices                                                                                                                        | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `it_devices_count`         | Number of affected IT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `ot_devices_count`         | Number of affected OT devices                                                                                                                         | `starts_with`,`not_equals`,`less_or_equal`,`greater_or_equal`,`not_between`,`is_null`,`is_not_null`,`equals`,`contains`,`ends_with`,`not_in`,`less`,`between`,`not_ends_with`,`not_contains`,`greater`,`not_starts_with`,`in`                                                                                                                                                                                                                                                                                                                             | | `status`                   | Alert status such as \"Resolved\" or \"Acknowledged\"                                                                                                     | _Not filterable_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | | `malicious_ip_tags_list`   | The Malicious IP Tags, powered by Anomali, associated with the Attempted Malicious Internet Communication and Malicious Internet Communication alerts | `has_any_not_ends_with`,`has_only_ends_with`,`has_only_equals`,`has_none_contains`,`equals`,`has_only_starts_with`,`contains`,`has_only_contains`,`has_none_ends_with`,`has_all_equals`,`not_contains`,`superset_of`,`none_equal`,`in`,`has_none_equals`,`starts_with`,`not_equals`,`has_none_starts_with`,`has_any_not_contains`,`is_null`,`has_any_contains`,`has_any_ends_with`,`is_not_null`,`all_equal`,`has_any_equals`,`ends_with`,`not_in`,`has_any_not_equals`,`not_ends_with`,`has_any_starts_with`,`has_any_not_starts_with`,`not_starts_with` |  </details>
+
+        :param get_alerts_parameters: (required)
+        :type get_alerts_parameters: GetAlertsParameters
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._get_alerts_api_v1_alerts_post_serialize(
+            get_alerts_parameters=get_alerts_parameters,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "GetAlertsResponse",
+            '422': "HTTPValidationError",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _get_alerts_api_v1_alerts_post_serialize(
+        self,
+        get_alerts_parameters,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+        if get_alerts_parameters is not None:
+            _body_params = get_alerts_parameters
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'CustomHTTPBearer'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/api/v1/alerts/',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
-            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
-            async_req=_params.get('async_req'),
-            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
-            _preload_content=_params.get('_preload_content', True),
-            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _request_auth=_params.get('_request_auth'))
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def set_alert_resolution_api_v1_device_alert_status_set_post(
+        self,
+        public_set_alert_resolution_params: PublicSetAlertResolutionParams,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> object:
+        """Set status for device alert relations
+
+        Set device-alert status to resolved or unresolved. If no filter_by parameter is provided, this API call will resolve or unresolve all device-alert relations for the specified alert IDs. if a filter_by parameter is provided, the API call will exclusively resolve or unresolve device-alert relations that meet the specified filter criteria   ### Fields supported by this endpoint All fields supported by [Get details of devices][1].  [1]: #operation/get_devices
+
+        :param public_set_alert_resolution_params: (required)
+        :type public_set_alert_resolution_params: PublicSetAlertResolutionParams
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._set_alert_resolution_api_v1_device_alert_status_set_post_serialize(
+            public_set_alert_resolution_params=public_set_alert_resolution_params,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "object",
+            '422': "HTTPValidationError",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def set_alert_resolution_api_v1_device_alert_status_set_post_with_http_info(
+        self,
+        public_set_alert_resolution_params: PublicSetAlertResolutionParams,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[object]:
+        """Set status for device alert relations
+
+        Set device-alert status to resolved or unresolved. If no filter_by parameter is provided, this API call will resolve or unresolve all device-alert relations for the specified alert IDs. if a filter_by parameter is provided, the API call will exclusively resolve or unresolve device-alert relations that meet the specified filter criteria   ### Fields supported by this endpoint All fields supported by [Get details of devices][1].  [1]: #operation/get_devices
+
+        :param public_set_alert_resolution_params: (required)
+        :type public_set_alert_resolution_params: PublicSetAlertResolutionParams
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._set_alert_resolution_api_v1_device_alert_status_set_post_serialize(
+            public_set_alert_resolution_params=public_set_alert_resolution_params,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "object",
+            '422': "HTTPValidationError",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def set_alert_resolution_api_v1_device_alert_status_set_post_without_preload_content(
+        self,
+        public_set_alert_resolution_params: PublicSetAlertResolutionParams,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """Set status for device alert relations
+
+        Set device-alert status to resolved or unresolved. If no filter_by parameter is provided, this API call will resolve or unresolve all device-alert relations for the specified alert IDs. if a filter_by parameter is provided, the API call will exclusively resolve or unresolve device-alert relations that meet the specified filter criteria   ### Fields supported by this endpoint All fields supported by [Get details of devices][1].  [1]: #operation/get_devices
+
+        :param public_set_alert_resolution_params: (required)
+        :type public_set_alert_resolution_params: PublicSetAlertResolutionParams
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._set_alert_resolution_api_v1_device_alert_status_set_post_serialize(
+            public_set_alert_resolution_params=public_set_alert_resolution_params,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "object",
+            '422': "HTTPValidationError",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _set_alert_resolution_api_v1_device_alert_status_set_post_serialize(
+        self,
+        public_set_alert_resolution_params,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+        if public_set_alert_resolution_params is not None:
+            _body_params = public_set_alert_resolution_params
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
+
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'CustomHTTPBearer'
+        ]
+
+        return self.api_client.param_serialize(
+            method='POST',
+            resource_path='/api/v1/device-alert-status/set',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+

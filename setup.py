@@ -1,5 +1,3 @@
-# coding: utf-8
-
 """
     Medigate API
 
@@ -20,14 +18,14 @@ from setuptools import setup, find_packages  # noqa: H301
 #
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
-NAME = "medigate-api"
-VERSION = "1.0.1"
-PYTHON_REQUIRES = ">=3.10"
+NAME = "medigate_api"
+VERSION = "1.0.0"
+PYTHON_REQUIRES = ">= 3.10"
 REQUIRES = [
-    "urllib3 >= 1.25.3, < 2.1.0",
-    "python-dateutil",
-    "pydantic >= 2.0.0",
-    "aenum"
+    "urllib3 >= 2.1.0, < 3.0.0",
+    "python-dateutil >= 2.8.2",
+    "pydantic >= 2.11",
+    "typing-extensions >= 4.7.1",
 ]
 
 setup(

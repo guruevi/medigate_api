@@ -17,60 +17,77 @@ import pprint
 import re  # noqa: F401
 import json
 
-
-
-from pydantic import BaseModel, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from typing import Any, ClassVar, Dict, List
 from medigate_api.models.public_device_target_spec import PublicDeviceTargetSpec
+from typing import Optional, Set
+from typing_extensions import Self
+from pydantic_core import to_jsonable_python
 
 class PublicSetCustomAttributeParams(BaseModel):
     """
-    The base class for parameters to a user annotations endpoint, specifying the target of the operation.  The target_specification is often a subclass of TargetSpec which includes a specification of exactly which targets should be operated on, such as a group of pagination parameters or a set of ids, but at the very minimum it must include the target type.  # noqa: E501
-    """
-    target_specification: PublicDeviceTargetSpec = Field(...)
-    custom_attribute_api_name: StrictStr = Field(..., description="The API name of the custom attribute whose value should be set.")
-    value: StrictStr = Field(..., description="The value to store to the custom attribute. Can be `null` to clear the existing value.")
-    __properties = ["target_specification", "custom_attribute_api_name", "value"]
+    The base class for parameters to a user annotations endpoint, specifying the target of the operation.  The target_specification is often a subclass of TargetSpec which includes a specification of exactly which targets should be operated on, such as a group of pagination parameters or a set of ids, but at the very minimum it must include the target type.
+    """ # noqa: E501
+    target_specification: PublicDeviceTargetSpec
+    custom_attribute_api_name: StrictStr = Field(description="The API name of the custom attribute whose value should be set.")
+    value: StrictStr = Field(description="The value to store to the custom attribute. Can be `null` to clear the existing value.")
+    __properties: ClassVar[List[str]] = ["target_specification", "custom_attribute_api_name", "value"]
 
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(
+        validate_by_name=True,
+        validate_by_alias=True,
+        validate_assignment=True,
+        protected_namespaces=(),
+    )
+
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.dict(by_alias=True))
+        return pprint.pformat(self.model_dump(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        return json.dumps(self.to_dict())
+        return json.dumps(to_jsonable_python(self.to_dict()))
 
     @classmethod
-    def from_json(cls, json_str: str) -> PublicSetCustomAttributeParams:
+    def from_json(cls, json_str: str) -> Optional[Self]:
         """Create an instance of PublicSetCustomAttributeParams from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self):
-        """Returns the dictionary representation of the model using alias"""
-        _dict = self.dict(by_alias=True,
-                          exclude={
-                          },
-                          exclude_none=True)
+    def to_dict(self) -> Dict[str, Any]:
+        """Return the dictionary representation of the model using alias.
+
+        This has the following differences from calling pydantic's
+        `self.model_dump(by_alias=True)`:
+
+        * `None` is only added to the output dict for nullable fields that
+          were set at model initialization. Other fields with value `None`
+          are ignored.
+        """
+        excluded_fields: Set[str] = set([
+        ])
+
+        _dict = self.model_dump(
+            by_alias=True,
+            exclude=excluded_fields,
+            exclude_none=True,
+        )
         # override the default output from pydantic by calling `to_dict()` of target_specification
         if self.target_specification:
             _dict['target_specification'] = self.target_specification.to_dict()
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> PublicSetCustomAttributeParams:
+    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
         """Create an instance of PublicSetCustomAttributeParams from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return PublicSetCustomAttributeParams.parse_obj(obj)
+            return cls.model_validate(obj)
 
-        _obj = PublicSetCustomAttributeParams.parse_obj({
-            "target_specification": PublicDeviceTargetSpec.from_dict(obj.get("target_specification")) if obj.get("target_specification") is not None else None,
+        _obj = cls.model_validate({
+            "target_specification": PublicDeviceTargetSpec.from_dict(obj["target_specification"]) if obj.get("target_specification") is not None else None,
             "custom_attribute_api_name": obj.get("custom_attribute_api_name"),
             "value": obj.get("value")
         })

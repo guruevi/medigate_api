@@ -2,6 +2,7 @@
 
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **filter_by** | [**FilterBy2**](FilterBy2.md) |  | [optional] 
@@ -21,12 +22,12 @@ json = "{}"
 # create an instance of GetAlertsParameters from a JSON string
 get_alerts_parameters_instance = GetAlertsParameters.from_json(json)
 # print the JSON string representation of the object
-print GetAlertsParameters.to_json()
+print(GetAlertsParameters.to_json())
 
 # convert the object into a dict
 get_alerts_parameters_dict = get_alerts_parameters_instance.to_dict()
 # create an instance of GetAlertsParameters from a dict
-get_alerts_parameters_form_dict = get_alerts_parameters.from_dict(get_alerts_parameters_dict)
+get_alerts_parameters_from_dict = GetAlertsParameters.from_dict(get_alerts_parameters_dict)
 ```
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

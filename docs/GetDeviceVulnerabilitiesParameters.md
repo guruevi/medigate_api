@@ -2,6 +2,7 @@
 
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **filter_by** | [**FilterBy4**](FilterBy4.md) |  | [optional] 
@@ -21,12 +22,12 @@ json = "{}"
 # create an instance of GetDeviceVulnerabilitiesParameters from a JSON string
 get_device_vulnerabilities_parameters_instance = GetDeviceVulnerabilitiesParameters.from_json(json)
 # print the JSON string representation of the object
-print GetDeviceVulnerabilitiesParameters.to_json()
+print(GetDeviceVulnerabilitiesParameters.to_json())
 
 # convert the object into a dict
 get_device_vulnerabilities_parameters_dict = get_device_vulnerabilities_parameters_instance.to_dict()
 # create an instance of GetDeviceVulnerabilitiesParameters from a dict
-get_device_vulnerabilities_parameters_form_dict = get_device_vulnerabilities_parameters.from_dict(get_device_vulnerabilities_parameters_dict)
+get_device_vulnerabilities_parameters_from_dict = GetDeviceVulnerabilitiesParameters.from_dict(get_device_vulnerabilities_parameters_dict)
 ```
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
